@@ -43,4 +43,11 @@ COPY ./certs /app/certs
 COPY health.sh /app/health.sh
 ARG SERVER_PORT
 EXPOSE ${SERVER_PORT}
+
+# add in seeker Python agent
+ENV SEEKER_SERVER_URL=https://poc271.seeker.synopsys.com:443
+ENV SEEKER_PROJECT_KEY=HVP-poc-crAPI-workshop  
+ENV SEEKER_AGENT_NAME=HVP-poc-agent-crAPI-workshop
+RUN pip install --trusted-host poc271.seeker.synopsys.com:443 --extra-index-url "https://poc271.seeker.synopsys.com/pypi-server/simple" seeker-agent
+
 CMD /app/runner.sh

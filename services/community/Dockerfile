@@ -23,13 +23,26 @@ COPY ./main.go ./main.go
 COPY ./api ./api
 RUN go mod vendor
 RUN ls -al
-RUN go build -o main .
+
+# build app with seeker agent
+ENV SEEKER_SERVER_URL=https://poc271.seeker.synopsys.com:443
+ENV SEEKER_PROJECT_KEY=HVP-poc-crAPI-community
+ENV SEEKER_AGENT_NAME=HVP-poc-agent-crAPI-community
+RUN apk add curl
+RUN sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' 'https://poc271.seeker.synopsys.com/rest/api/latest/installers/agents/scripts/GO?osFamily=LINUX&downloadWith=curl&projectKey=HVP-poc-crAPI-community&webServer=GO_LINUX_DEFAULT&flavor=DEFAULT&agentName=&accessToken=')"
+RUN chmod +x ./seeker/seeker-agent-linux-amd64
+RUN ./seeker/seeker-agent-linux-amd64 go build -o main .
 RUN go test -v ./...
 WORKDIR /dist
 RUN cp /build/main .
 
 # Main Image
 FROM alpine:3
+
+# set env for seeker agent
+ENV SEEKER_SERVER_URL=https://poc271.seeker.synopsys.com:443
+ENV SEEKER_PROJECT_KEY=HVP-poc-crAPI-community
+ENV SEEKER_AGENT_NAME=HVP-poc-agent-crAPI-community
 
 # go
 WORKDIR /app

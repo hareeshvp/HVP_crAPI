@@ -18,10 +18,10 @@ DIR="$( cd "$( dirname "$0" )" >/dev/null 2>&1 && pwd )"
 
 # Load the data
 echo "Check Django models"
-python3 manage.py migrate
+seeker-exec python3 manage.py migrate
 
-python3 manage.py check &&\
-python3 manage.py health_check
+seeker-exec python3 manage.py check &&\
+seeker-exec python3 manage.py health_check
 
 ## Uncomment the following line if you wish to run tests
 IS_TESTING=True python3 manage.py test --no-input
@@ -38,9 +38,9 @@ if [ "$TLS_ENABLED" = "true" ] || [ "$TLS_ENABLED" = "1" ]; then
   fi
   echo "TLS_CERTIFICATE: $TLS_CERTIFICATE"
   echo "TLS_KEY: $TLS_KEY"
-  python3 manage.py runserver_plus --cert-file $TLS_CERTIFICATE --key-file $TLS_KEY --noreload 0.0.0.0:${SERVER_PORT}
+  seeker-exec python3 manage.py runserver_plus --cert-file $TLS_CERTIFICATE --key-file $TLS_KEY --noreload 0.0.0.0:${SERVER_PORT}
 else
   echo "TLS is DISABLED"
-  python3 manage.py runserver 0.0.0.0:${SERVER_PORT} --noreload
+  seeker-exec python3 manage.py runserver 0.0.0.0:${SERVER_PORT} --noreload
 fi
 exec "$@"

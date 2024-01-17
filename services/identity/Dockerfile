@@ -19,6 +19,7 @@ COPY *.gradle.kts ./
 # Eat the expected build failure since no source code has been copied yet
 RUN gradle clean build --no-daemon > /dev/null 2>&1 || true
 COPY src src
+RUN gradle :spotlessApply
 RUN gradle build
 RUN gradle bootJar
 
@@ -34,6 +35,15 @@ ARG SERVER_PORT
 EXPOSE ${SERVER_PORT}
 
 ENV JAVA_TOOL_OPTIONS "-Xmx128m"
+
+# add in seeker JAVA agent
+ENV SEEKER_SERVER_URL=https://poc271.seeker.synopsys.com:443
+ENV SEEKER_PROJECT_KEY=HVP-poc-crAPI-identity
+ENV SEEKER_AGENT_NAME=HVP-poc-agent-crAPI-identity
+COPY /openapi-spec/openapi-spec.json /openapi-spec/openapi-spec.json
+RUN sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' 'https://poc271.seeker.synopsys.com/rest/api/latest/installers/agents/scripts/JAVA?osFamily=LINUX&downloadWith=curl&projectKey=HVP-poc-crAPI-identity&webServer=OTHER&flavor=DEFAULT&agentName=HVP-poc-agent-crAPI-identity&accessToken=')"
+ENV JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -javaagent:$PWD/seeker/seeker-agent.jar"
+ENV SEEKER_AGENT_APP_OPENAPI_SPEC_FILE="/openapi-spec/openapi-spec.json"
 
 COPY jwks.json default_jwks.json
 COPY entrypoint.sh /entrypoint.sh

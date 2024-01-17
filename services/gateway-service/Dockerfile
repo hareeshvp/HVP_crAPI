@@ -8,7 +8,13 @@ RUN go mod download
 COPY . ./
 
 # Build the binary.
-RUN go build -v -o server
+# build app with seeker agent
+ENV SEEKER_SERVER_URL=https://poc271.seeker.synopsys.com:443
+ENV SEEKER_PROJECT_KEY=HVP-poc-crAPI-gateway
+ENV SEEKER_AGENT_NAME=HVP-poc-agent-crAPI-gateway
+RUN sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' 'https://poc271.seeker.synopsys.com/rest/api/latest/installers/agents/scripts/GO?osFamily=LINUX&downloadWith=curl&projectKey=HVP-poc-crAPI-gateway&webServer=GO_LINUX_DEFAULT&flavor=DEFAULT&agentName=&accessToken=')"
+RUN chmod +x ./seeker/seeker-agent-linux-amd64
+RUN ./seeker/seeker-agent-linux-amd64 go build -v -o server
 
 RUN wget https://github.com/minio/certgen/releases/latest/download/certgen-linux-amd64 -O /tmp/certgen \
     && chmod +x /tmp/certgen
@@ -18,6 +24,11 @@ RUN ls -la
 
 FROM debian:buster-slim
 WORKDIR /app
+
+# set up env for seeker Go agent
+ENV SEEKER_SERVER_URL=https://poc271.seeker.synopsys.com:443
+ENV SEEKER_PROJECT_KEY=HVP-poc-crAPI-gateway
+ENV SEEKER_AGENT_NAME=HVP-poc-agent-crAPI-gateway
 
 RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     ca-certificates && \
