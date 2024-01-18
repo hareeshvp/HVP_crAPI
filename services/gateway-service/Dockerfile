@@ -12,7 +12,7 @@ COPY . ./
 ENV SEEKER_SERVER_URL=https://poc271.seeker.synopsys.com:443
 ENV SEEKER_PROJECT_KEY=HVP-poc-crAPI-gateway
 ENV SEEKER_AGENT_NAME=HVP-poc-agent-crAPI-gateway
-RUN sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' 'https://poc271.seeker.synopsys.com/rest/api/latest/installers/agents/scripts/GO?osFamily=LINUX&downloadWith=curl&projectKey=HVP-poc-crAPI-gateway&webServer=GO_LINUX_DEFAULT&flavor=DEFAULT&agentName=&accessToken=')"
+RUN sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' 'https://poc271.seeker.synopsys.com/rest/api/latest/installers/agents/scripts/GO?osFamily=LINUX&downloadWith=curl&projectKey=HVP-poc-crAPI-gateway&webServer=GO_LINUX_DEFAULT&flavor=DEFAULT&agentName=HVP-poc-agent-crAPI-gateway&accessToken=')"
 RUN chmod +x ./seeker/seeker-agent-linux-amd64
 RUN ./seeker/seeker-agent-linux-amd64 go build -v -o server
 
