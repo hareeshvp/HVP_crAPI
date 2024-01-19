@@ -41,8 +41,9 @@ ENV SEEKER_SERVER_URL=https://poc271.seeker.synopsys.com:443
 ENV SEEKER_PROJECT_KEY=HVP-poc-crAPI-identity
 ENV SEEKER_AGENT_NAME=HVP-poc-agent-crAPI-identity
 COPY /openapi-spec/openapi-spec.json /openapi-spec/openapi-spec.json
-RUN sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' 'https://poc271.seeker.synopsys.com/rest/api/latest/installers/agents/scripts/JAVA?osFamily=LINUX&downloadWith=curl&projectKey=HVP-poc-crAPI-identity&webServer=OTHER&flavor=DEFAULT&agentName=HVP-poc-agent-crAPI-identity&accessToken=')"
-ENV JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -javaagent:$PWD/seeker/seeker-agent.jar"
+COPY /seeker/seeker-agent.jar /seeker/seeker-agent.jar
+# RUN sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' 'https://poc271.seeker.synopsys.com/rest/api/latest/installers/agents/scripts/JAVA?osFamily=LINUX&downloadWith=curl&projectKey=HVP-poc-crAPI-identity&webServer=OTHER&flavor=DEFAULT&agentName=HVP-poc-agent-crAPI-identity&accessToken=')"
+ENV JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -javaagent:/seeker/seeker-agent.jar"
 ENV SEEKER_AGENT_APP_OPENAPI_SPEC_FILE="/openapi-spec/openapi-spec.json"
 
 COPY jwks.json default_jwks.json
